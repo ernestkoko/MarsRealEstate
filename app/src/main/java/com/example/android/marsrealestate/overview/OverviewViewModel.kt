@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.android.marsrealestate.network.MarsApi
+import com.example.android.marsrealestate.network.MarsProperty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,11 +34,16 @@ import kotlinx.coroutines.launch
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData String that stores the status of the most recent request
-    private val _response = MutableLiveData<String>()
+    private val _status = MutableLiveData<String>()
 
     // The external immutable LiveData for the request status String
     val response: LiveData<String>
-        get() = _response
+        get() = _status
+
+    private val _property = MutableLiveData<MarsProperty>()
+
+    val  property: LiveData<MarsProperty>
+    get() = _property
 
     // we create a job
     private var viewModelJob = Job()
@@ -63,17 +69,20 @@ class OverviewViewModel : ViewModel() {
             try {
                 //returns the result from the network call when the value is ready
                 var listResult = getPropertiesDeferred.await()
+                if (listResult.size > 0){
+                    _property.value = listResult[0]
+                }
                 //handles the result
-                _response.value = "Success: ${listResult.size} Mars property received"
+               // _status.value = "Success: ${listResult.size} Mars property received"
             } catch (t: Throwable) {
                 //handles the failure
-                _response.value = "Failure: " + t.message
+                _status.value = "Failure: " + t.message
 
             }
 
         }
 
-        _response.value = "Set the Mars API Response here!"
+        _status.value = "Set the Mars API Response here!"
     }
 
     //called when the viewModel dies
