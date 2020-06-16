@@ -40,10 +40,10 @@ class OverviewViewModel : ViewModel() {
     val response: LiveData<String>
         get() = _status
 
-    private val _property = MutableLiveData<MarsProperty>()
+    private val _properties = MutableLiveData<List<MarsProperty>>()
 
-    val  property: LiveData<MarsProperty>
-    get() = _property
+    val  properties: LiveData<List<MarsProperty>>
+    get() = _properties
 
     // we create a job
     private var viewModelJob = Job()
@@ -70,7 +70,7 @@ class OverviewViewModel : ViewModel() {
                 //returns the result from the network call when the value is ready
                 var listResult = getPropertiesDeferred.await()
                 if (listResult.size > 0){
-                    _property.value = listResult[0]
+                    _properties.value = listResult
                 }
                 //handles the result
                // _status.value = "Success: ${listResult.size} Mars property received"

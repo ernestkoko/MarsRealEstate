@@ -16,3 +16,55 @@
  */
 
 package com.example.android.marsrealestate.overview
+
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.example.android.marsrealestate.databinding.GridViewItemBinding
+import com.example.android.marsrealestate.network.MarsProperty
+
+class PhotoGridAdapter :
+        ListAdapter<MarsProperty, PhotoGridAdapter.MarsPropertyViewModel>(DiffCallBack) {
+
+    //view Holder
+    class MarsPropertyViewModel(private var binding: GridViewItemBinding) :
+            RecyclerView.ViewHolder(binding.root) {
+        fun bind(marsProperty: MarsProperty) {
+            //bind the marProperty to the property variable from the xml file
+            binding.property = marsProperty
+            //ensures the views are redrawn immediately
+            binding.executePendingBindings()
+        }
+
+    }
+
+    //a class for comparing the items to know whether to update the view
+    companion object DiffCallBack : DiffUtil.ItemCallback<MarsProperty>() {
+        override fun areItemsTheSame(oldItem: MarsProperty, newItem: MarsProperty): Boolean {
+            return oldItem === newItem
+
+        }
+
+        override fun areContentsTheSame(oldItem: MarsProperty, newItem: MarsProperty): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGridAdapter.MarsPropertyViewModel {
+        return MarsPropertyViewModel(GridViewItemBinding.inflate(LayoutInflater.from(parent.context)))
+
+    }
+
+    override fun onBindViewHolder(holder: PhotoGridAdapter.MarsPropertyViewModel, position: Int) {
+        //get the item at the position
+        val marsProperty = getItem(position)
+        //bind it
+        holder.bind(marsProperty)
+
+    }
+
+}
