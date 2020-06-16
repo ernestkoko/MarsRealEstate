@@ -27,17 +27,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-
+enum class MarsApiStatus{LOADING, ERROR, DONE}
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
  */
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData String that stores the status of the most recent request
-    private val _status = MutableLiveData<String>()
+    private val _status = MutableLiveData<MarsApiStatus>()
 
     // The external immutable LiveData for the request status String
-    val response: LiveData<String>
+    val status: LiveData<MarsApiStatus>
         get() = _status
 
     private val _properties = MutableLiveData<List<MarsProperty>>()
@@ -67,22 +67,25 @@ class OverviewViewModel : ViewModel() {
             //make a network call on the background thread
             val getPropertiesDeferred = MarsApi.retrofitService.getProperties()
             try {
+                //loading state
+                _status.value = MarsApiStatus.LOADING
                 //returns the result from the network call when the value is ready
-                var listResult = getPropertiesDeferred.await()
-                if (listResult.size > 0){
-                    _properties.value = listResult
-                }
-                //handles the result
-               // _status.value = "Success: ${listResult.size} Mars property received"
+                val listResult = getPropertiesDeferred.await()
+                //done when we are finished
+                _status.value = MarsApiStatus.DONE
+                _properties.value = listResult
+
             } catch (t: Throwable) {
                 //handles the failure
-                _status.value = "Failure: " + t.message
+                _status.value = MarsApiStatus.ERROR
+                //set the recycler view list to zero on error
+                _properties.value = ArrayList()
 
             }
 
         }
 
-        _status.value = "Set the Mars API Response here!"
+       // _status.value = "Set the Mars API Response here!"
     }
 
     //called when the viewModel dies
