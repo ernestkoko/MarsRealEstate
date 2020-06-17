@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+//class that tells about different loading conditions
 enum class MarsApiStatus{LOADING, ERROR, DONE}
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
@@ -44,6 +45,11 @@ class OverviewViewModel : ViewModel() {
 
     val  properties: LiveData<List<MarsProperty>>
     get() = _properties
+
+    //navigate when an item is selected
+    private val _navigateToSelectedProperty = MutableLiveData<MarsProperty>()
+    val navigateToSelectedProperty: LiveData<MarsProperty>
+    get() = _navigateToSelectedProperty
 
     // we create a job
     private var viewModelJob = Job()
@@ -93,5 +99,15 @@ class OverviewViewModel : ViewModel() {
         super.onCleared()
         //cancels the job when the viewModel dies
         viewModelJob.cancel()
+    }
+
+    //set a marsProperty that will be observed in the fragment
+    fun displayPropertyDetails(marsProperty: MarsProperty){
+        _navigateToSelectedProperty.value = marsProperty
+
+    }
+    //called when we are done navigating
+    fun displayPropertyDetailsComplete(){
+        _navigateToSelectedProperty.value = null
     }
 }
